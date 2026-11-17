@@ -1,96 +1,168 @@
 # CAB — Crew Agent Board
 
-**Um quadro kanban local onde agentes de IA fazem o trabalho e você toma as decisões.**
+**English** · [Português](README.pt-BR.md)
 
-Você escreve um **pedido** ("login com e-mail", "corrigir o relatório de vendas"). O CAB quebra em **tarefas** com
-dependências, cada tarefa roda num agente (Claude ou Codex) numa cópia isolada do seu repositório, passa por um
-agente revisor e volta para você aceitar. **Nada chega ao seu código sem o seu aceite.**
+**A local kanban board where AI agents do the work and you make the calls.**
 
-> Este repositório guarda só os instaladores e as atualizações do app. Baixe em
-> **[Releases → última versão](https://github.com/sargita92/cab-releases/releases/latest)**.
+You write a **request** ("email login", "fix the sales report"). CAB breaks it into **tasks** with dependencies; each
+task runs on an agent (Claude or Codex) in an isolated copy of your repository, goes through a reviewer agent and
+comes back for you to accept. **Nothing reaches your code without your approval.**
 
-## Como funciona
+> This repository only hosts the app installers and updates. Download from
+> **[Releases → latest](https://github.com/sargita92/cab-releases/releases/latest)**.
+>
+> The app's interface is in Portuguese; screen names below are quoted as they appear, with a translation.
+
+## How it works
 
 ```
-pedido ──► planner quebra em tarefas ──► você aprova a definição
-                                              │
-          ┌───────────────────────────────────┘
+request ──► planner breaks it into tasks ──► you approve the definition
+                                                  │
+          ┌───────────────────────────────────────┘
           ▼
-  agente executa (worktree próprio) ──► reviewer revisa ──► você aceita, corrige ou reprova
-                                                                    │
-                                                    entrega: nada · branch · PR
+  agent works (own worktree) ──► reviewer checks ──► you accept, correct or reject
+                                                              │
+                                              delivery: none · branch · PR
 ```
 
-- **Cada tarefa num worktree** (branch `crew/<pedido>/<tarefa>`): o seu checkout não é tocado.
-- **Perguntas (❓):** quando o agente tem dúvida, a triagem responde o que já está no pedido ou no código; o resto vem
-  para você.
-- **Travou (⛔):** erro, limite, conflito — aparece no card com o motivo e o botão Retomar.
-- **Em paralelo:** várias tarefas ao mesmo tempo, respeitando as dependências (🔗).
-- **Transparente:** log ao vivo de cada agente, tokens, ferramentas usadas — e uma sala em pixel art com a equipe
-  trabalhando.
+- **One worktree per task** (branch `crew/<request>/<task>`): your checkout is never touched.
+- **Questions (❓):** when an agent is unsure, triage answers what is already in the request or the code; the rest
+  comes to you.
+- **Stuck (⛔):** error, usage limit, conflict — shown on the card with the reason and a Resume button.
+- **Parallel:** several tasks at once, respecting dependencies (🔗).
+- **Transparent:** live log of every agent, tokens and tools used — plus a pixel-art office with the team at work.
 
-## Instalar
+## Install
 
-| Sistema | Arquivo | Observação |
+| System | File | Notes |
 |---|---|---|
-| **Windows** | `CAB-x.y.z-setup.exe` | Instala no seu usuário, sem admin. O SmartScreen avisa porque o app não é assinado: **Mais informações → Executar assim mesmo**. |
-| **Linux / WSL** | `CAB-x.y.z.AppImage` | `chmod +x CAB-*.AppImage` e rode. É o formato que se atualiza sozinho. |
-| **Linux / WSL (.deb)** | `CAB-x.y.z.deb` | `sudo apt install ./CAB-*.deb`. No WSL, o CAB aparece no menu Iniciar do Windows. |
-| **Mac (Apple Silicon)** | `CAB-x.y.z-arm64.dmg` | Sem assinatura da Apple: depois de arrastar para Aplicativos, rode `xattr -cr /Applications/CAB.app` uma vez (senão o Mac diz que "está danificado"). |
+| **Windows** | `CAB-x.y.z-setup.exe` | Per-user install, no admin. SmartScreen warns because the app is unsigned: **More info → Run anyway**. |
+| **Linux / WSL** | `CAB-x.y.z.AppImage` | `chmod +x CAB-*.AppImage` and run it. This is the format that updates itself. |
+| **Linux / WSL (.deb)** | `CAB-x.y.z.deb` | `sudo apt install ./CAB-*.deb`. On WSL, CAB shows up in the Windows Start menu. |
+| **Mac (Apple Silicon)** | `CAB-x.y.z-arm64.dmg` | Not signed by Apple: after dragging it to Applications, run `xattr -cr /Applications/CAB.app` once (otherwise macOS says it "is damaged"). |
 
-### O que precisa ter na máquina
+### Requirements
 
-- **git** — os projetos são repositórios git.
-- **Uma conta de IA** — o Claude já vem dentro do app:
-  - **Claude:** assinatura (Pro/Max) ou chave de API. Se você já usa o Claude Code nesta máquina, o login dele vale.
-    Senão, configure em **⚙ Configuração → Contas** (o app mostra o passo a passo e o comando pronto).
-  - **Codex** (opcional): `codex login` ou chave de API, também em **Contas**.
-- **GitHub CLI (`gh`) autenticado** — só se quiser que as entregas virem pull requests.
+- **git** — projects are git repositories.
+- **An AI account** — Claude ships inside the app:
+  - **Claude:** subscription (Pro/Max) or API key. If you already use Claude Code on this machine, its login works.
+    Otherwise set it up in **⚙ → Contas** (Accounts) — the app shows the steps and a ready-to-copy command.
+  - **Codex** (optional): `codex login` or an API key, also under **Contas**.
+- **GitHub CLI (`gh`), logged in** — only if you want deliveries as pull requests.
 
-## Primeiros passos
+## Getting started
 
-1. Abra o CAB → **📁 Projetos → + Adicionar projeto** e escolha a pasta do seu repositório (ou **Novo projeto**).
-2. Clique em **+ Pedido** e descreva o que quer, como descreveria para uma pessoa.
-3. O planner devolve as tarefas em **Revisar definição**: leia, ajuste se quiser e **aprove**.
-4. Acompanhe pelo quadro. Quando uma tarefa chegar em **Revisar resultado**, veja o diff e **aceite**, **corrija**
-   (com um comentário — ela roda de novo) ou **reprove**.
-5. Na aba **⚙ Projeto**, escolha a entrega: só no worktree, numa branch ou num **PR** (empilhados, na ordem das
-   dependências).
+1. Open CAB → **📁 Projetos → + Adicionar projeto** (Projects → Add project) and pick your repository folder (or
+   **Novo projeto** to create one).
+2. Click **+ Pedido** (Request) and describe what you want, as you would to a person.
+3. The planner returns the tasks under **Revisar definição** (Review definition): read, tweak if needed and
+   **approve**.
+4. Follow along on the board. When a task reaches **Revisar resultado** (Review result), check the diff and
+   **accept**, **correct** (with a comment — it runs again) or **reject**.
+5. In **⚙ → Projeto** (Project), choose the delivery: worktree only, a branch, or a **PR** (stacked, in dependency
+   order).
 
-**Dica:** o botão **Conversa** abre um chat com um agente que conhece o CAB — peça "cria um pedido pra X", "por que a
-tarefa 01 não começa?" ou "monta o crew deste projeto".
+## Chat — the assistant that knows your project
 
-## Outros jeitos de usar
+The **Conversa** (Chat) button opens a chat with an agent that runs **inside your repository** and **operates CAB**.
+It knows everything about the project:
 
-- **Navegador:** com o app aberto, o quadro também fica em `http://127.0.0.1:4747`.
+- **The code:** reads, searches, runs commands and tests, edits files — like Claude Code in a terminal.
+- **The board:** requests, tasks, statuses, each agent's logs, pending questions, why something is stuck.
+- **CAB itself:** it carries the built-in manual (formats, profiles, recipes) and the project's configuration.
+
+So you can just ask:
+
+- "create a request to add CSV export"
+- "why doesn't task 01 start?" · "what did the executor do on task 03?"
+- "unblock task 02" · "accept 01" (it only accepts when you explicitly ask)
+- "always run the QA agent before the reviewer" — it edits the profile
+- "set up crew for this project" — builds tailored agents and a flow for a new repository
+- "create a Trello plugin"
+
+Each message can pick the **model**, **effort**, **Plan** mode (proposes, doesn't edit) and **MCPs globais** (use the
+MCP servers you installed in Claude Code). Attachments work too (📎, Ctrl+V, drag and drop). Coming from another tool
+with its own agents (`.claude/agents/`)? **Portar para o CAB** (Port to CAB) opens a chat that converts agents, flow
+and backlog.
+
+## Agents
+
+Every step of the flow is an agent — a file with instructions, tools, model and limits.
+
+| Agent | What it does |
+|---|---|
+| `planner` | Breaks the request into tasks with dependencies |
+| `executor` | Does the task in its worktree |
+| `reviewer` | Reviews the result before it reaches you (rejects → back to the executor) |
+| `triage` | Answers agent questions already covered by the request/code; decides whether a long task keeps going or is stuck |
+| `fixer` | Tries to fix a ⛔ before calling you (optional) |
+| `conflict_resolver` | Resolves merge conflicts between tasks |
+| `pr_publisher` | Opens the PR when the task reaches review (optional) |
+| `chat`, `telegram`, `porter` | The Chat, the Telegram bot and the project porter |
+| `agent_writer`, `claudemd_writer` | Create agents and the repository's `CLAUDE.md` from plain text |
+
+The built-ins are generic. The real power is **creating your own** — `backend-dev`, `qa`, `designer`, `rpa`… — and a
+**profile** that chains them (e.g. `planner → backend-dev → qa → reviewer`). Each agent can use a different
+provider: planner on Claude, executor on Codex.
+
+On a task, the **Agentes** (Agents) tab lists every run (time, tokens, tools). The 🏢 button opens the **agents'
+office**: pixel art with the team typing at their desks while they work and grabbing coffee when they don't.
+
+## Telegram
+
+Talk to CAB from your phone.
+
+1. Create a bot with **@BotFather** and copy the token.
+2. In **⚙ → Telegram**, paste the token, turn it on and save.
+3. Send the bot a message: it shows your id. Fill it in and save — only you can talk to it.
+
+From then on you get notified of **questions (❓)**, **stuck tasks (⛔)**, **definitions to approve** and **results
+to accept**. Replying to a notification already tells it which task you mean: "use JWT", "approve", "correct: the
+test is missing". It also understands plain language ("how's the board?", "create a request to…"). `/novo` starts a
+new conversation.
+
+## Settings (⚙)
+
+Everything is a file, in layers — the most specific wins: **built-in** → **Meu** (Mine, all projects, `~/.crew/`) →
+**Só este projeto** (This project only, `<repo>/.crew/`, can be committed for the team). Editing a built-in saves
+your own copy; the original never changes.
+
+| Tab | For |
+|---|---|
+| **Agentes** (Agents) | Create and edit agents by form or raw file; **Descrever com IA** (Describe with AI) creates one from text |
+| **Perfis** (Profiles) | The flow: who plans, executes, reviews, triages, fixes and delivers |
+| **Projeto** (Project) | Project profile, delivery (none/branch/PR), parallel tasks, execution mode, generate `CLAUDE.md` |
+| **Ondas** (Waves) | Wave plan: the next wave starts only when the current one is accepted (shown in Waves mode) |
+| **Plugins** | Integrations (**Jira** is built in: pulls cards in as requests and moves the card as the task progresses) |
+| **Geral** (General) | Default provider (Claude/Codex), attachment limit, auto-archive, display options |
+| **Contas** (Accounts) | Personal × work accounts per project; **backup accounts** take over when one hits its usage limit |
+| **Telegram** | The bot (above) |
+
+**Execution modes:** **classic** (each slot takes a task to the end), **assembly line** (each agent is a station with
+a queue: the executor hands off to the reviewer and picks up the next one) and **Waves**. **⏸ Pausar tudo** (Pause
+all) stops every agent at once; **▶ Retomar** (Resume) continues where they left off.
+
+## Other ways to use it
+
+- **Browser:** while the app is open, the board is also at `http://127.0.0.1:4747`.
 - **Claude Code / VS Code (MCP):**
-  `claude mcp add --transport http crew http://127.0.0.1:4747/mcp` — veja o quadro, crie pedidos, responda e
-  aprove sem sair do editor.
-- **Telegram:** em **⚙ Configuração → Telegram**, ligue um bot e converse com o CAB pelo celular; ele avisa de
-  perguntas, travamentos e resultados para aceitar.
+  `claude mcp add --transport http crew http://127.0.0.1:4747/mcp` — see the board, create requests, answer and
+  approve without leaving the editor.
 
-## Personalizar
+## Updates
 
-Agentes, perfis (o fluxo: quem planeja, quem executa, quem revisa) e plugins são arquivos, editáveis em
-**⚙ Configuração** — inclusive com **Descrever com IA**. Valem para todos os projetos ou só para um. Dá para misturar
-provedores (planner no Claude, executor no Codex), usar contas reserva quando uma bate no limite e integrar com o
-Jira (embutido).
+The app checks for a new version on launch and every 6 hours.
 
-## Atualizações
+- **Windows and AppImage:** downloads in the background and asks **Restart?**; if you postpone, it installs when you
+  quit. Agents running at that moment become ⛔ interrupted and come back with **Resume**.
+- **Mac and .deb:** tells you about the new version and opens this page for you to download.
 
-O app procura versão nova ao abrir e a cada 6 horas.
+## Troubleshooting
 
-- **Windows e AppImage:** baixa sozinho e pergunta **Reiniciar?**; se você deixar para depois, instala ao sair do app.
-  Agentes rodando no momento ficam ⛔ interrompidos e voltam com **Retomar**.
-- **Mac e .deb:** avisa da versão nova e abre esta página para você baixar.
-
-## Problemas comuns
-
-- **Porta 4747 ocupada:** o app usa outra porta livre sozinho.
-- **App no Windows e CAB no WSL na mesma máquina:** quem abre primeiro fica com o `localhost:4747`. Use um dos dois
-  por vez.
-- **Emoji como quadrado no Linux/WSL:** `sudo apt install fonts-noto-color-emoji`.
-- **Rodar tarefas no Windows nativo** ainda não foi validado; no WSL e no Linux está bem testado.
+- **Port 4747 in use:** the app picks another free port by itself.
+- **Windows app and CAB on WSL on the same machine:** whichever starts first gets `localhost:4747`. Use one at a time.
+- **Emoji shown as boxes on Linux/WSL:** `sudo apt install fonts-noto-color-emoji`.
+- **Running tasks on native Windows** is not validated yet; WSL and Linux are well tested.
 
 ---
 
